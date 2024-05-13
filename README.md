@@ -21,7 +21,7 @@ with hubspot_interest as (
 
 ), 
 
-select * from first_interest
+select * from first_interest where 1=1
 ```
 ## Guidelines
 
