@@ -118,3 +118,70 @@ from users
 -- Bad
 select * from users where email = 'name@example.com'
 ```
+
+## List of SQL main Operations and order them. 
+
+We use in main pipelines and jobs only select, from, join, left join, where, group by, limit. And only in this order. First use all joins , then left joins. No having , right join, outer join, cross join etc.
+
+
+```sql
+-- Good 
+select *
+from users
+join orders o       on o.user_id = u.id
+join product p      on p.id      = o.product_id 
+left join regions r on r.user_id = o.region_id 
+
+-- Good
+select *
+from users u
+join orders o on o.user_id = u.id
+where email = 'name@example.com' 
+
+-- Bad
+select *
+from users
+join orders o       on o.user_id = u.id
+left join regions r on r.user_id = o.region_id 
+join product p      on p.id      = o.product_id 
+
+-- Bad
+select *
+from users u
+cross join orders o on o.user_id = u.id
+where email = 'name@example.com' 
+```
+
+
+When selecting all main opearations from beginning without space or tabs. For 'and' use double space.
+
+```sql
+-- Good too
+select *
+from users
+
+-- Good
+select * 
+from users u
+join orders o on o.user_id = u.id
+where u.email = 'name@example.com' 
+  and u.date >= date '2020-01-01'
+
+-- Bad
+select * 
+    from users 
+    where email = 'name@example.com'
+
+-- Bad
+select * 
+    from users 
+        join orders o on o.user_id = u.id
+    where email = 'name@example.com'
+
+
+-- Bad
+select * 
+    from users 
+        where email = 'name@example.com'
+
+```
