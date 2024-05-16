@@ -198,3 +198,53 @@ select *
         where email = 'name@example.com'
 
 ```
+
+
+## Indenting where conditions
+
+Similarly, conditions should always be spread across multiple lines to maximize readability and make them easier to add to. Operators 'and','or' should be placed at the beginnig of each line:
+
+```sql
+-- Good
+select *
+from users
+where 1=1
+  and email = 'example@domain.com'
+
+-- Good
+select *
+from users
+where email like '%@domain.com' 
+  and created_at >= '2021-10-08'
+
+-- Bad
+select *
+from users
+where email like '%@domain.com' and created_at >= '2021-10-08'
+
+-- Bad
+select *
+from users
+where email like '%@domain.com' and
+      created_at >= '2021-10-08' 
+```
+
+### Use single quotes
+
+Some SQL dialects like BigQuery support using double quotes, but for most dialects double quotes will wind up referring to column names. For that reason, single quotes are preferable:
+
+```sql
+-- Good
+select *
+from users
+where 
+    email = 'example@domain.com'
+
+-- Bad
+select *
+from users
+where 
+    email = "example@domain.com"
+```
+
+
