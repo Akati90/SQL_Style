@@ -153,7 +153,7 @@ where email = 'name@example.com'
 ```
 
 
-When selecting all main opearations from beginning without space or tabs. For 'and' use double space.
+When selecting all main operations from beginning of line without space or tabs. For 'and' use double space. For subqueries in operator 'with' use tabs
 
 ```sql
 -- Good too
@@ -166,6 +166,19 @@ from users u
 join orders o on o.user_id = u.id
 where u.email = 'name@example.com' 
   and u.date >= date '2020-01-01'
+
+-- Good
+with sr as ( -- sel_and_cus_CRP
+    select 
+             invoice_id 
+            ,count(1) as cnt
+    from schema_esf.table_esf v1
+    where 1=1  
+      and v1.status in ('CREATED', 'DELIVERED','SEND_TO_ISGO','CANCELED_BY_OGD')
+    group by invoice_id 
+)
+select *
+from sr
 
 -- Bad
 select * 
