@@ -419,7 +419,7 @@ from users u
 
 ### Group using only column names, not numbers
 
-If group using column, it has to be in select in same order
+If group using column, it has to be in select in same order:
 
 ```sql
 -- Good
@@ -445,7 +445,7 @@ group by c.user_id
 -- Bad -- order of columns is different
 select  
         c.user_id,
-        c.region
+        c.region,
         count(*) as total_charges
 from charges c
 group by c.region, 
@@ -474,7 +474,7 @@ group by c.region,
 -- Bad 
 select 
          count(*) as total_charges
-        ,c.user_id, 
+        ,c.user_id 
 from charges c
 group by c.user_id
 
@@ -482,7 +482,7 @@ group by c.user_id
 select  
         c.region, 
         count(*) as total_charges,
-        c.user_id,
+        c.user_id
 from charges c
 group by c.region, 
          c.user_id
@@ -607,7 +607,7 @@ with ordered_details as (
             b.user_id,
             b.name,
             row_number() over (partition by b.user_id order by b.date_updated desc) as details_rank
-    billing_stored_details b
+    from billing_stored_details b
 ),
 first_updates as (
     select 
@@ -632,3 +632,101 @@ from (
 ) ranked
 where details_rank = 1
 ```
+
+
+### Distinct
+
+Use `group by` instead of `distinct`, `distinct` is ok only in `count` statement:
+
+```sql
+-- Good -- unique users
+select 
+        c.user_id, 
+from charges c
+group by c.user_id
+
+-- Good
+select  
+         c.region
+        ,count(distinct c.user_id) as cnt_dist_users
+from charges c
+group by c.region
+
+-- Bad 
+select 
+        distinct c.user_id 
+from charges c
+```
+
+### Schema name
+
+Write full table name with schema name:
+
+```sql
+-- Good  
+select 
+        c.user_id 
+from schema_name.charges c
+
+-- Bad 
+select 
+        c.user_id 
+from charges c
+```
+
+### Truncate instead of delete table
+
+Always use  `truncate table`:
+
+```sql
+-- Good  
+truncate table schema_name.charges;
+
+-- Bad 
+delete table schema_name.charges;
+```
+
+### Between is not good
+
+Just use `>= and <=`:
+
+```sql
+-- Good
+select
+        u.id,
+        u.email
+from schema_name.users u
+where 1=1
+  and u.created_at >= date '2020-01-01'
+  and u.created_at <  date '2021-01-01'
+
+-- Bad 
+select
+        u.id,
+        u.email
+from schema_name.users u
+where 1=1
+  and u.created_at between date '2020-01-01' and date '2021-01-01'
+```
+
+### Double partition 
+
+Use `()over(partition by)` one at a time:
+
+```sql
+-- Good  
+select
+            b.user_id,
+            b.name,
+            row_number()over(partition by b.user_id order by b.date_updated desc) as details_rank
+from schema_name.billing_stored_details b
+
+-- Bad 
+select
+            b.user_id,
+            rank()over(partition by ...)over(partition by ...) ...
+from schema_name.billing_stored_details b
+```
+
+
+
